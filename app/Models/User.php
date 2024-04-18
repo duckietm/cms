@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\NotificationType;
 use Filament\Panel;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
@@ -10,14 +11,17 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\{
     Casts\Attribute,
-    Factories\HasFactory
+    Factories\HasFactory,
+    Model
 };
 use App\Models\{
     User\UserBadge,
+    User\UserNotification,
     User\UserItem,
     User\UserOrder,
     Article\ArticleComment
 };
+use App\Models\Compositions\HasNotificationUrl;
 use App\Models\Compositions\User\{
     HasCurrency,
     HasItems,
@@ -243,6 +247,17 @@ class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
         return $this->hasMany(GuildMember::class);
     }
 
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(UserNotification::class, 'recipient_id');
+    }
+
+    public function followers(): HasMany
+    {
+        return $this->hasMany(AuthorNotification::class, 'author_id')
+            ->whereActive(true);
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return $this->hasHighPermissions();
@@ -312,5 +327,15 @@ class User extends Authenticatable implements FilamentUser, HasName, HasAvatar
     public function hasIncompleteTwoFactorAuthentication(): bool
     {
         return $this->two_factor_secret && !$this->hasEnabledTwoFactorAuthentication();
+    }
+
+    public function notify(null|User $sender, NotificationType $type, null|string $notificationUrl = null): void
+    {
+        $this->notifications()->create([
+            'sender_id' => $sender->id,
+            'type' => $type->value,
+            'message' => $type->getMessage(),
+            'url' => $notificationUrl
+        ]);
     }
 }

@@ -25,7 +25,8 @@ use App\Http\Controllers\{
     Profile\MessageController as UserHomeMessageController,
     Profile\ItemController as UserHomeItemController,
     ShopController,
-    TeamController
+    TeamController,
+    UserNotificationController
 };
 
 /*
@@ -95,6 +96,10 @@ Route::prefix('articles')
         Route::post('{id}/{slug}/react', [ArticleController::class, 'toggleReaction'])
             ->middleware('auth')
             ->name('reactions.toggle');
+
+        Route::post('{id}/{slug}/author-notifications/toggle', [ArticleController::class, 'toggleAuthorNotifications'])
+            ->middleware('auth')
+            ->name('author-notifications.toggle');
     });
 
 Route::prefix('community')
@@ -119,7 +124,6 @@ Route::prefix('community')
 Route::name('users.')
     ->middleware('auth')
     ->group(function () {
-
         Route::prefix('profile')
             ->name('profile.')
             ->middleware('throttle:120,1')
@@ -145,6 +149,18 @@ Route::name('users.')
 
                 Route::get('/purchases', [UserSettingController::class, 'purchases'])->name('purchases');
                 Route::get('confirm-password', [WebController::class, 'confirmPassword'])->name('password.confirm');
+
+                Route::prefix('notifications')
+                    ->name('notifications.')
+                    ->middleware('throttle:30,1')
+                    ->group(function () {
+                        Route::post('/', [UserNotificationController::class, 'index'])->name('index');
+                        Route::post('/count', [UserNotificationController::class, 'count'])->name('count');
+                        Route::post('/visit', [UserNotificationController::class, 'visit'])->name('visit');
+
+                        Route::post('/mark-all-as-read', [UserNotificationController::class, 'markAllAsRead'])->name('mark-all-as-read');
+                        Route::post('/delete-all', [UserNotificationController::class, 'deleteAllNotifications'])->name('delete-all');
+                    });
             });
     });
 

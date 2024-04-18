@@ -7,6 +7,7 @@ import Navigation from '../components/Navigation'
 import TippyWrapper from '../external/TippyWrapper'
 import NotyfWrapper from '../external/NotyfWrapper'
 import SwiperWrapper from '../external/SwiperWrapper'
+import Notification from '../components/Notification'
 import DiscordWidget from '../components/DiscordWidget'
 import OnlineFriends from '../components/OnlineFriends'
 import Authentication from '../components/Authentication'
@@ -22,6 +23,7 @@ import AccountSettings from '../components/Pages/Users/AccountSettings'
 import PasswordSettings from '../components/Pages/Users/PasswordSettings'
 import ArticleReaction from '../components/Pages/Articles/ArticleReaction'
 import ImageVisualizationWrapper from '../external/ImageVisualizationWrapper'
+import ArticleNotification from '../components/Pages/Articles/ArticleNotification'
 import UserProfileManager from '../components/Pages/Users/UserProfile/UserProfileManager'
 
 export default class WebManager {
@@ -48,12 +50,14 @@ export default class WebManager {
         Authentication.start()
         ImageVisualizationWrapper.start()
         OnlineFriends.start()
+        Notification.start()
         TextareaEditor.start()
         Orion.start()
         Navigation.start()
         Staff.start()
         AutomaticSearch.start()
         ArticleReaction.start()
+        ArticleNotification.start()
         SelectLanguage.start()
 
         // User Components
